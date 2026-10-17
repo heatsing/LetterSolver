@@ -1,211 +1,90 @@
-# 部署指南
-## Word Unscrambler - lettersolver.net
+# Netlify 部署指南
 
-**最后更新**: 2026-01-28  
-**状态**: 代码已推送到 GitHub，等待部署
+主站是仓库根目录的 Astro 静态项目，仓库为 [heatsing/LetterSolver](https://github.com/heatsing/LetterSolver)。Netlify 已关联此仓库；将迁移配置提交并推送到生产分支 `main` 后，会触发自动构建和部署。本指南描述部署步骤，不代表代码已经推送或域名已经切换。
 
----
+## 构建配置
 
-## ✅ 已完成
+根目录 `netlify.toml` 是构建、重定向和响应头的配置来源。在 Netlify 项目设置中确认生产分支为 `main`，并清除旧的 `astro` 子目录设置：
 
-- ✅ 代码已推送到 GitHub `main` 分支
-- ✅ 项目构建成功（121 个页面）
-- ✅ 修复了语法错误
+| 设置 | 值 |
+| --- | --- |
+| Base directory | 仓库根目录，留空或 `.` |
+| Package directory（若已设置） | 仓库根目录，留空或 `.` |
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+| Node.js | `24`，由 `NODE_VERSION` 固定 |
+| npm 安装参数 | `--include=dev`，由 `NPM_FLAGS` 指定 |
 
----
+依赖使用根目录 `package-lock.json`，构建工具包含在开发依赖中。项目保持 `output: 'static'`，无需添加 Netlify adapter。根目录的构建命令会生成词库、执行 Astro 构建，再运行 `scripts/ensure-sitemap.mjs`。
 
-## 🚀 部署方式
+## 本地验证与自动部署
 
-### 方式 1: GitHub 自动部署（推荐）
+在仓库根目录使用 Node.js 24 执行：
 
-如果你的 GitHub 仓库已连接到 Vercel，推送代码后会自动触发部署：
-
-1. **检查 Vercel 连接**
-   - 访问: https://vercel.com/dashboard
-   - 查看项目: `word-unscrambler` 或 `heatsinghaiqing-2741s-projects/v0-word-unscrambler-bo`
-   - 确认 GitHub 集成已启用
-
-2. **自动部署**
-   - 代码推送到 `main` 分支后，Vercel 会自动检测并部署
-   - 部署通常需要 2-5 分钟
-   - 在 Vercel Dashboard 查看部署状态
-
-3. **验证部署**
-   ```bash
-   # 检查网站是否可访问
-   curl -I https://lettersolver.net
-   
-   # 检查 sitemap
-   curl https://lettersolver.net/sitemap.xml
-   ```
-
-### 方式 2: Vercel CLI 手动部署
-
-如果需要手动部署：
-
-1. **登录 Vercel**
-   ```bash
-   cd "C:\Users\heats\Desktop\word-unscrambler-main"
-   vercel login
-   ```
-   - 会打开浏览器进行登录
-   - 或使用 `vercel login --github` 通过 GitHub 登录
-
-2. **部署到生产环境**
-   ```bash
-   vercel --prod --yes
-   ```
-
-3. **查看部署状态**
-   ```bash
-   vercel ls
-   ```
-
----
-
-## 📋 部署检查清单
-
-### 部署前
-- [x] 代码已提交到 Git
-- [x] 代码已推送到 GitHub
-- [x] 本地构建成功（`npm run build`）
-- [x] 无构建错误
-
-### 部署后验证
-
-#### 1. 网站可访问性
-- [ ] 首页可访问: https://lettersolver.net
-- [ ] 主要工具页面可访问
-- [ ] 新页面可访问:
-  - https://lettersolver.net/text-twist
-  - https://lettersolver.net/word-search-solver
-  - https://lettersolver.net/hangman-solver
-  - https://lettersolver.net/letter-boxed-solver
-
-#### 2. SEO 文件
-- [ ] Sitemap 可访问: https://lettersolver.net/sitemap.xml
-- [ ] Robots.txt 可访问: https://lettersolver.net/robots.txt
-- [ ] Sitemap 格式正确（XML）
-- [ ] Sitemap 包含所有页面（740+）
-
-#### 3. 功能验证
-- [ ] 导航菜单正常工作
-- [ ] Daily Game Hints 下拉菜单显示正确
-- [ ] 页脚评分组件可点击
-- [ ] 评分后投票数增加
-- [ ] 所有工具页面功能正常
-
-#### 4. Google Search Console
-- [ ] 提交更新的 sitemap
-- [ ] 验证结构化数据
-- [ ] 检查索引状态
-
----
-
-## 🔧 环境变量（如需要）
-
-如果项目需要环境变量，在 Vercel Dashboard 中设置：
-
-1. 访问项目设置: https://vercel.com/dashboard
-2. 进入 **Settings** → **Environment Variables**
-3. 添加必要的环境变量
-
-**当前项目可能需要的环境变量**:
-- `NEXT_PUBLIC_*` - 公共环境变量
-- `SENTRY_DSN` - Sentry 错误监控（如果使用）
-
----
-
-## 📊 部署统计
-
-### 构建结果
-- **总页面数**: 121 个
-- **静态页面**: 大部分页面
-- **动态页面**: 字母组合页面（SSG）
-- **构建时间**: ~15-20 秒
-
-### 页面类型
-- ○ Static - 静态预渲染
-- ● SSG - 静态站点生成（使用 generateStaticParams）
-- ƒ Dynamic - 按需服务器渲染
-
----
-
-## 🆘 故障排除
-
-### 问题 1: 部署失败
-
-**可能原因**:
-- 构建错误
-- 环境变量缺失
-- 依赖安装失败
-
-**解决方案**:
 ```bash
-# 本地测试构建
+npm ci
 npm run build
-
-# 检查错误日志
-# 在 Vercel Dashboard 查看部署日志
+npm run preview
 ```
 
-### 问题 2: 网站无法访问
+在预览服务器显示的地址检查首页、工具页面和 `/sitemap.xml`。`npm run preview` 只预览静态文件；Netlify 的重定向和响应头需要在 Netlify 部署地址上确认。
 
-**可能原因**:
-- DNS 未配置
-- 域名未绑定
-- 部署未完成
+将改动提交并推送到 `main` 后，在 [Netlify 控制台](https://app.netlify.com/) 打开该项目的部署记录，检查构建日志以及发布目录。先通过项目的 `*.netlify.app` 地址检查页面，再切换正式域名。
 
-**解决方案**:
-1. 检查 Vercel Dashboard 部署状态
-2. 确认域名绑定正确
-3. 等待 DNS 传播（最多 24-48 小时）
+## 环境变量与词库
 
-### 问题 3: Sitemap 404
+在 Netlify 项目的环境变量设置中添加实际需要的构建变量。当前广告组件使用以下可选变量：
 
-**可能原因**:
-- 路由配置问题
-- 文件未正确生成
+- `PUBLIC_ADSENSE_CLIENT`：AdSense 发布商 ID。
+- `PUBLIC_ADSENSE_SLOT`：广告位 ID。
 
-**解决方案**:
-```bash
-# 验证 sitemap.ts 存在
-ls app/sitemap.ts
+`PUBLIC_*` 变量会用于客户端输出，不应放置密钥。无需配置旧文档中的 `NEXT_PUBLIC_*` 或 `SENTRY_DSN`。
 
-# 检查 next.config.mjs 配置
-# 确认 vercel.json 头部配置正确
-```
+正常生产构建保持 `SKIP_REMOTE_DICT` 未设置，以便脚本下载完整远程词表。`SKIP_REMOTE_DICT=1` 会跳过下载，使用本地 `words_alpha.txt` 或内置小词表，并合并 `words.txt`；缺少完整本地词表时会减少可查询单词。远程下载失败时也会回退，需在构建日志中确认词库来源。
 
----
+## 域名迁移
 
-## 📝 部署命令参考
+1. 确认 Netlify 部署成功，预览地址上的工具可以使用。
+2. 在 Netlify 域名管理中添加 `lettersolver.net`，如使用 `www`，同时添加 `www.lettersolver.net` 并设置主域名。
+3. 在 DNS 服务商处按照该 Netlify 项目显示的记录更新域名解析，替换原来指向 Vercel 的对应记录。
+4. 等待 Netlify 完成域名验证和 HTTPS 证书配置，再检查正式域名。
+5. 确认流量已切换且功能正常后，可断开旧 Vercel 项目的 Git 自动部署，避免重复构建。
+
+项目 canonical URL 和 sitemap URL 继续使用 `https://lettersolver.net`，因此无需更改网站域名配置。
+
+## 部署后检查
+
+以下为命令行示例；Windows PowerShell 可使用 `curl.exe` 代替 `curl`。
 
 ```bash
-# 构建项目
-npm run build
-
-# 本地预览
-npm run start
-
-# Vercel 部署
-vercel --prod --yes
-
-# 查看部署列表
-vercel ls
-
-# 查看部署日志
-vercel logs
+curl -I https://lettersolver.net/
+curl -I https://lettersolver.net/sitemap.xml
+curl -I https://lettersolver.net/sitemap-index.xml
+curl -I https://lettersolver.net/sitemap-0.xml
+curl -I https://lettersolver.net/robots.txt
+curl -I https://lettersolver.net/5-letter-words
+npm run validate:sitemap -- https://lettersolver.net
 ```
 
----
+预期行为：
 
-## 🔗 有用链接
+- 首页和主要工具页面正常打开；不存在的页面返回 404。
+- `/sitemap.xml` 和 `/sitemap-index.xml` 返回 200 与 XML 类型；`/robots.txt` 返回文本并声明正式 sitemap 地址。
+- `/sitemap-0.xml` 返回 301，跳转至同站点的 `/sitemap.xml`。
+- `/2-letter-words` 至 `/10-letter-words` 返回 301，分别跳转至 `/two-letter-words` 至 `/ten-letter-words`。
 
-- **Vercel Dashboard**: https://vercel.com/dashboard
-- **GitHub 仓库**: https://github.com/heatsing/word-unscrambler
-- **Google Search Console**: https://search.google.com/search-console
-- **网站**: https://lettersolver.net
+重定向使用相对路径，便于在 Netlify 预览域名上测试。`force = true` 确保规则优先于同路径的静态文件。
 
----
+`validate:sitemap` 默认检查 `http://localhost:4321`，生产检查应明确传入上述正式 URL。脚本会跟随 sitemap index 中的绝对分片地址；当前这些地址指向正式域名，因此传入本地或 Netlify 预览地址不能证明所有分片都来自该预览部署。
 
-**部署完成后，请验证所有功能并提交 sitemap 到 Google Search Console！**
+Google Search Console 可提交 `https://lettersolver.net/sitemap.xml`，也可提交保留的 `/sitemap-index.xml`。`sitemap.xml` 是首个分片的副本；若以后生成多个分片，应提交 index 以覆盖所有分片。详情见 [Sitemap 说明](docs/SITEMAP-GSC-FIX.md)。
+
+## 常见问题
+
+- **构建了旧站或找不到配置**：检查 Base directory、Package directory 是否误设为 `astro`，主站应从仓库根目录构建。
+- **依赖安装失败**：检查日志是否使用 Node.js 24 和 npm，确认提交了 `package-lock.json`，并保留 `NPM_FLAGS=--include=dev`。
+- **词库明显变小**：检查远程下载日志和 `SKIP_REMOTE_DICT`，必要时准备完整本地 `words_alpha.txt`。
+- **sitemap 404**：确认构建命令包含 `node scripts/ensure-sitemap.mjs`，产物中存在 `dist/sitemap.xml`、`dist/sitemap-index.xml`，发布目录是 `dist`。
+- **正式域名仍显示旧站**：检查 Netlify 域名验证、DNS 记录和 HTTPS 状态，再确认实际访问的部署版本。
+
+参考：[Astro 部署到 Netlify](https://docs.astro.build/en/guides/deploy/netlify/)、[Netlify 构建依赖管理](https://docs.netlify.com/build/configure-builds/manage-dependencies/)。

@@ -30,7 +30,7 @@ This project targets **US** users: students, teachers, word-game players, and an
 ## 🛠️ Local Development (Astro)
 
 ```bash
-npm install
+npm ci
 npm run dev       # http://localhost:4321
 npm run build     # builds dict + Astro → dist/
 npm run preview   # serve dist/
@@ -40,7 +40,21 @@ npm run preview   # serve dist/
 
 ## 📦 Deployment
 
-Deploy easily with Vercel for automatic builds and hosting (`vercel.json` uses `npm run build` and `dist/`).
+Deploy the root Astro project to **Netlify**. The repository is connected to Netlify; pushing to the production branch (`main`) triggers a build and deployment. Build settings, redirects, and response headers are defined in the root `netlify.toml`.
+
+| Setting | Value |
+| --- | --- |
+| Base directory | Repository root (`.`) |
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+| Node.js | `24` |
+| Package manager | npm, using `package-lock.json` |
+
+Use the repository root for both the base and package directory settings; the `astro/` folder is a historical subproject. This site uses static output and needs no Netlify adapter. `NPM_FLAGS=--include=dev` keeps the build tools available during dependency installation.
+
+Optional build environment variables are `PUBLIC_ADSENSE_CLIENT` and `PUBLIC_ADSENSE_SLOT`. Keep `SKIP_REMOTE_DICT` unset for normal production builds: setting it to `1` skips the remote dictionary and can reduce word coverage when no full local dictionary is available.
+
+After a successful Netlify deployment, add `lettersolver.net` in domain management and update DNS using the records shown by Netlify. See [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) for migration steps and verification commands. Astro's [Netlify deployment guide](https://docs.astro.build/en/guides/deploy/netlify/) explains static hosting support.
 
 ### Nginx (project-integrated)
 

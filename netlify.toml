@@ -1,0 +1,108 @@
+# Build the main Astro site from the repository root, not the legacy astro/ app.
+[build]
+  base = "."
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  # The dictionary builder and Tailwind integration need devDependencies.
+  NPM_FLAGS = "--include=dev"
+
+# Keep legacy URLs working on production and Netlify deploy previews.
+[[redirects]]
+  from = "/10-letter-words"
+  to = "/ten-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/9-letter-words"
+  to = "/nine-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/8-letter-words"
+  to = "/eight-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/7-letter-words"
+  to = "/seven-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/6-letter-words"
+  to = "/six-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/5-letter-words"
+  to = "/five-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/4-letter-words"
+  to = "/four-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/3-letter-words"
+  to = "/three-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/2-letter-words"
+  to = "/two-letter-words"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/sitemap-0.xml"
+  to = "/sitemap.xml"
+  status = 301
+  # Astro generates sitemap-0.xml; the post-build script copies it to sitemap.xml.
+  force = true
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/sitemap-index.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/sitemap-0.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/sitemap-1.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/sitemap-2.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
